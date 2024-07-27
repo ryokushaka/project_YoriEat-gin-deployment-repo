@@ -1,4 +1,4 @@
-module yorieat
+module github.com/ryokushaka/project_YoriEat-gin-deployment-repo
 
 go 1.22.5
 
