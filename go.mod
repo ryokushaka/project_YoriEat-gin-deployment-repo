@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.8.2
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/jmoiron/sqlx v1.4.0
+	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
 	go.mongodb.org/mongo-driver v1.11.1
