@@ -2,64 +2,141 @@ package repository_test
 
 import (
 	"context"
-	"errors"
+	"database/sql"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jmoiron/sqlx"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
-	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/mongo/mocks"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/repository"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TestCreate(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
 
-	var databaseHelper *mocks.Database
-	var collectionHelper *mocks.Collection
+	sqlxDB := sqlx.NewDb(db, "sqlmock")
 
-	databaseHelper = &mocks.Database{}
-	collectionHelper = &mocks.Collection{}
-
-	collectionName := domain.CollectionUser
+	ur := repository.NewUserRepository(sqlxDB)
 
 	mockUser := &domain.User{
-		ID:       primitive.NewObjectID(),
-		Name:     "Test",
-		Email:    "test@gmail.com",
+		ID:       "1",
+		Name:     "TestUser",
 		Password: "password",
+		Email:    "testuser@gmail.com",
 	}
 
-	mockEmptyUser := &domain.User{}
-	mockUserID := primitive.NewObjectID()
-
 	t.Run("success", func(t *testing.T) {
-
-		collectionHelper.On("InsertOne", mock.Anything, mock.AnythingOfType("*domain.User")).Return(mockUserID, nil).Once()
-
-		databaseHelper.On("Collection", collectionName).Return(collectionHelper)
-
-		ur := repository.NewUserRepository(databaseHelper, collectionName)
+		query := `INSERT INTO users $begin:math:text$id, name, password, email$end:math:text$ VALUES $begin:math:text$\\?, \\?, \\?, \\?$end:math:text$`
+		mock.ExpectExec(query).
+			WithArgs(mockUser.ID, mockUser.Name, mockUser.Password, mockUser.Email).
+			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		err := ur.Create(context.Background(), mockUser)
 
 		assert.NoError(t, err)
-
-		collectionHelper.AssertExpectations(t)
+		assert.NoError(t, mock.ExpectationsWereMet())
 	})
 
 	t.Run("error", func(t *testing.T) {
-		collectionHelper.On("InsertOne", mock.Anything, mock.AnythingOfType("*domain.User")).Return(mockEmptyUser, errors.New("Unexpected")).Once()
+		query := `INSERT INTO users $begin:math:text$id, name, password, email$end:math:text$ VALUES $begin:math:text$\\?, \\?, \\?, \\?$end:math:text$`
+		mock.ExpectExec(query).
+			WithArgs(mockUser.ID, mockUser.Name, mockUser.Password, mockUser.Email).
+			WillReturnError(sql.ErrConnDone)
 
-		databaseHelper.On("Collection", collectionName).Return(collectionHelper)
-
-		ur := repository.NewUserRepository(databaseHelper, collectionName)
-
-		err := ur.Create(context.Background(), mockEmptyUser)
+		err := ur.Create(context.Background(), mockUser)
 
 		assert.Error(t, err)
+		assert.NoError(t, mock.ExpectationsWereMet())
+	})
+}
 
-		collectionHelper.AssertExpectations(t)
+func TestGetByEmail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	sqlxDB := sqlx.NewDb(db, "sqlmock")
+
+	ur := repository.NewUserRepository(sqlxDB)
+
+	mockUser := domain.User{
+		ID:       "1",
+		Name:     "TestUser",
+		Password: "password",
+		Email:    "testuser@gmail.com",
+	}
+
+	t.Run("success", func(t *testing.T) {
+		query := `SELECT id, name, password, email FROM users WHERE email = \?`
+		rows := sqlmock.NewRows([]string{"id", "name", "password", "email"}).
+			AddRow(mockUser.ID, mockUser.Name, mockUser.Password, mockUser.Email)
+
+		mock.ExpectQuery(query).WithArgs(mockUser.Email).WillReturnRows(rows)
+
+		user, err := ur.GetByEmail(context.Background(), mockUser.Email)
+
+		assert.NoError(t, err)
+		assert.Equal(t, mockUser, user)
+		assert.NoError(t, mock.ExpectationsWereMet())
 	})
 
+	t.Run("error", func(t *testing.T) {
+		query := `SELECT id, name, password, email FROM users WHERE email = \?`
+		mock.ExpectQuery(query).WithArgs(mockUser.Email).WillReturnError(sql.ErrConnDone)
+
+		_, err := ur.GetByEmail(context.Background(), mockUser.Email)
+
+		assert.Error(t, err)
+		assert.NoError(t, mock.ExpectationsWereMet())
+	})
+}
+
+func TestGetByID(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer db.Close()
+
+	sqlxDB := sqlx.NewDb(db, "sqlmock")
+
+	ur := repository.NewUserRepository(sqlxDB)
+
+	mockUser := domain.User{
+		ID:       "1",
+		Name:     "TestUser",
+		Password: "password",
+		Email:    "testuser@gmail.com",
+	}
+
+	t.Run("success", func(t *testing.T) {
+		query := `SELECT id, name, password, email FROM users WHERE id = \?`
+		rows := sqlmock.NewRows([]string{"id", "name", "password", "email"}).
+			AddRow(mockUser.ID, mockUser.Name, mockUser.Password, mockUser.Email)
+
+		mock.ExpectQuery(query).WithArgs(mockUser.ID).WillReturnRows(rows)
+
+		user, err := ur.GetByID(context.Background(), mockUser.ID)
+
+		assert.NoError(t, err)
+		assert.Equal(t, mockUser, user)
+		assert.NoError(t, mock.ExpectationsWereMet())
+	})
+
+	t.Run("error", func(t *testing.T) {
+		query := `SELECT id, name, password, email FROM users WHERE id = \?`
+		mock.ExpectQuery(query).WithArgs(mockUser.ID).WillReturnError(sql.ErrConnDone)
+
+		_, err := ur.GetByID(context.Background(), mockUser.ID)
+
+		assert.Error(t, err)
+		assert.NoError(t, mock.ExpectationsWereMet())
+	})
 }

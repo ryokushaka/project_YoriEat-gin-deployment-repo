@@ -1,19 +1,21 @@
 package bootstrap
 
-import "github.com/ryokushaka/project_YoriEat-gin-deployment-repo/mongo"
+import (
+	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/postgres"
+)
 
 type Application struct {
-	Env   *Env
-	Mongo mongo.Client
+	Env *Env
+	Postgres *postgres.Client
 }
 
 func App() Application {
 	app := &Application{}
 	app.Env = NewEnv()
-	app.Mongo = NewMongoDatabase(app.Env)
+	app.Postgres = NewPostgresDatabase(app.Env)
 	return *app
 }
 
 func (app *Application) CloseDBConnection() {
-	CloseMongoDBConnection(app.Mongo)
+	ClosePostgresDBConnection(app.Postgres)
 }
