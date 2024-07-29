@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/postgres"
 )
 
