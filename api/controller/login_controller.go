@@ -15,6 +15,12 @@ type LoginController struct {
 	Env          *bootstrap.Env
 }
 
+func NewLoginController(usecase domain.LoginUsecase) *LoginController {
+	return &LoginController{
+		LoginUsecase: usecase,
+	}
+}
+
 func (lc *LoginController) Login(c *gin.Context) {
 	var request domain.LoginRequest
 

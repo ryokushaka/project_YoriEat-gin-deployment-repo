@@ -1,56 +1,42 @@
 package bootstrap
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"time"
 
-	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/mongo"
+	"github.com/jmoiron/sqlx"
+	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/postgres"
 )
 
-func NewMongoDatabase(env *Env) mongo.Client {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
+func NewPostgresDatabase(env *Env) *postgres.Client {
 	dbHost := env.DBHost
 	dbPort := env.DBPort
 	dbUser := env.DBUser
 	dbPass := env.DBPass
+	dbName := env.DBName
 
-	mongodbURI := fmt.Sprintf("mongodb://%s:%s@%s:%s", dbUser, dbPass, dbHost, dbPort)
-
-	if dbUser == "" || dbPass == "" {
-		mongodbURI = fmt.Sprintf("mongodb://%s:%s", dbHost, dbPort)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPass, dbName)
+	db, err := sqlx.Connect("postgres", dsn)
+	if err != nil {
+		log.Fatal("Failed to connect to PostgreSQL:", err)
 	}
 
-	client, err := mongo.NewClient(mongodbURI)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Connect(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Ping(ctx)
-	if err != nil {
-		log.Fatal(err)
+	client := &postgres.Client{
+		DB: db,
 	}
 
 	return client
 }
 
-func CloseMongoDBConnection(client mongo.Client) {
-	if client == nil {
+func ClosePostgresDBConnection(client *postgres.Client) {
+	if client == nil || client.DB == nil {
 		return
 	}
 
-	err := client.Disconnect(context.TODO())
+	err := client.DB.Close()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to close PostgreSQL connection:", err)
 	}
 
-	log.Println("Connection to MongoDB closed.")
+	log.Println("Connection to PostgreSQL closed.")
 }
