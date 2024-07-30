@@ -9,11 +9,12 @@ type Application struct {
 	Postgres *postgres.Client
 }
 
-func App() Application {
-	app := &Application{}
-	app.Env = NewEnv()
-	app.Postgres = NewPostgresDatabase(app.Env)
-	return *app
+func App() *Application {
+	env := NewEnv()
+	return &Application{
+		Env: env,
+		Postgres: NewPostgresDatabase(env),
+	}
 }
 
 func (app *Application) CloseDBConnection() {

@@ -10,23 +10,16 @@ import (
 )
 
 func NewPostgresDatabase(env *Env) *postgres.Client {
-	dbHost := env.DBHost
-	dbPort := env.DBPort
-	dbUser := env.DBUser
-	dbPass := env.DBPass
-	dbName := env.DBName
-
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPass, dbName)
+	dsn := fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		env.DBHost, env.DBPort, env.DBUser, env.DBPass, env.DBName,
+	)
 	db, err := sqlx.Connect("postgres", dsn)
 	if err != nil {
 		log.Fatal("Failed to connect to PostgreSQL:", err)
 	}
 
-	client := &postgres.Client{
-		DB: db,
-	}
-
-	return client
+	return &postgres.Client{DB: db}
 }
 
 func ClosePostgresDBConnection(client *postgres.Client) {
