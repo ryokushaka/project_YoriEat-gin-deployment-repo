@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,15 @@ import (
 )
 
 func main() {
-
+	// 애플리케이션 초기화
 	app := bootstrap.App()
+
+	// 데이터베이스 연결 확인
+	err := app.Postgres.DB.Ping()
+	if err != nil {
+		log.Fatalf("Failed to connect to the database: %v", err)
+	}
+	log.Println("Successfully connected to the database!")
 
 	env := app.Env
 
@@ -18,9 +26,9 @@ func main() {
 
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
-	gin := gin.Default()
+	router := gin.Default()
 
-	route.Setup(env, timeout, app.Postgres.DB, gin)
+	route.Setup(env, timeout, app.Postgres.DB, router)
 
-	gin.Run(env.ServerAddress)
+	router.Run(env.ServerAddress)
 }
