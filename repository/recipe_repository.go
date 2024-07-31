@@ -50,3 +50,15 @@ func (rr *recipeRepository) GetByID(ctx context.Context, id string) (domain.Reci
 	}
 	return recipe, nil
 }
+
+func (rr *recipeRepository) Update(ctx context.Context, recipe *domain.Recipe) error {
+	query := `UPDATE recipes SET name = $1, text = $2, ingredient = $3, time = $4, process = $5, tags = $6, description = $7, category_id = $8, user_id = $9 WHERE id = $10`
+	_, err := rr.db.ExecContext(ctx, query, recipe.Name, recipe.Text, recipe.Ingredient, recipe.Time, recipe.Process, recipe.Tags, recipe.Description, recipe.CategoryID, recipe.UserID, recipe.ID)
+	return err
+}
+
+func (rr *recipeRepository) Delete(ctx context.Context, id string) error {
+	query := `DELETE FROM recipes WHERE id = $1`
+	_, err := rr.db.ExecContext(ctx, query, id)
+	return err
+}
