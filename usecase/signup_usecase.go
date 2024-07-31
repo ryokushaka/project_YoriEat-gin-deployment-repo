@@ -2,34 +2,40 @@ package usecase
 
 import (
 	"context"
-	"time"
-
+	"errors"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/internal/tokenutil"
 )
 
 type signupUsecase struct {
-	userRepository domain.UserRepository
-	contextTimeout time.Duration
+	userRepo           domain.UserRepository
+	tokenSecret        string
+	tokenExpiry        int
+	refreshTokenExpiry int
 }
 
-func NewSignupUsecase(userRepository domain.UserRepository, timeout time.Duration) domain.SignupUsecase {
+func NewSignupUsecase(userRepo domain.UserRepository, tokenSecret string, tokenExpiry int, refreshTokenExpiry int) domain.SignupUsecase {
 	return &signupUsecase{
-		userRepository: userRepository,
-		contextTimeout: timeout,
+		userRepo:           userRepo,
+		tokenSecret:        tokenSecret,
+		tokenExpiry:        tokenExpiry,
+		refreshTokenExpiry: refreshTokenExpiry,
 	}
 }
 
 func (su *signupUsecase) Create(c context.Context, user *domain.User) error {
-	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
-	defer cancel()
-	return su.userRepository.Create(ctx, user)
+	existingUser, err := su.userRepo.GetByEmail(c, user.Email)
+	if err != nil {
+		return err
+	}
+	if existingUser.ID != 0 {
+		return errors.New("email already in use")
+	}
+	return su.userRepo.Create(c, user)
 }
 
 func (su *signupUsecase) GetUserByEmail(c context.Context, email string) (domain.User, error) {
-	ctx, cancel := context.WithTimeout(c, su.contextTimeout)
-	defer cancel()
-	return su.userRepository.GetByEmail(ctx, email)
+	return su.userRepo.GetByEmail(c, email)
 }
 
 func (su *signupUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {
