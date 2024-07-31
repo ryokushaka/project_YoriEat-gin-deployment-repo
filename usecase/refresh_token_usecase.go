@@ -2,28 +2,36 @@ package usecase
 
 import (
 	"context"
-	"time"
-
+	"errors"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/internal/tokenutil"
 )
 
 type refreshTokenUsecase struct {
-	userRepository domain.UserRepository
-	contextTimeout time.Duration
+	userRepo           domain.UserRepository
+	tokenSecret        string
+	tokenExpiry        int
+	refreshTokenExpiry int
 }
 
-func NewRefreshTokenUsecase(userRepository domain.UserRepository, timeout time.Duration) domain.RefreshTokenUsecase {
+func NewRefreshTokenUsecase(userRepo domain.UserRepository, tokenSecret string, tokenExpiry int, refreshTokenExpiry int) domain.RefreshTokenUsecase {
 	return &refreshTokenUsecase{
-		userRepository: userRepository,
-		contextTimeout: timeout,
+		userRepo:           userRepo,
+		tokenSecret:        tokenSecret,
+		tokenExpiry:        tokenExpiry,
+		refreshTokenExpiry: refreshTokenExpiry,
 	}
 }
 
 func (rtu *refreshTokenUsecase) GetUserByID(c context.Context, id string) (domain.User, error) {
-	ctx, cancel := context.WithTimeout(c, rtu.contextTimeout)
-	defer cancel()
-	return rtu.userRepository.GetByID(ctx, id)
+	user, err := rtu.userRepo.GetByID(c, id)
+	if err != nil {
+		return domain.User{}, err
+	}
+	if user.ID == 0 {
+		return domain.User{}, errors.New("user not found")
+	}
+	return user, nil
 }
 
 func (rtu *refreshTokenUsecase) CreateAccessToken(user *domain.User, secret string, expiry int) (accessToken string, err error) {
