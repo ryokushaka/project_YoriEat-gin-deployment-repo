@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	route "github.com/ryokushaka/project_YoriEat-gin-deployment-repo/api/route"
+	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/api/route"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/bootstrap"
 )
 

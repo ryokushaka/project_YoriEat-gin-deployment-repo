@@ -20,5 +20,5 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, gin *gin.Engi
 	// Middleware to verify AccessToken
 	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
 	// All Private APIs
-	NewProfileRouter(env, timeout, db, protectedRouter)
+	//NewUserRouter(env, timeout, db, protectedRouter)
 }

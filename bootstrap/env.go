@@ -35,6 +35,17 @@ func NewEnv() *Env {
 		log.Fatal("Environment can't be loaded: ", err)
 	}
 
+	requiredEnvVars := []string{
+		env.DBHost, env.DBPort, env.DBUser, env.DBPass, env.DBName,
+		env.AccessTokenSecret, env.RefreshTokenSecret,
+	}
+
+	for _, v := range requiredEnvVars {
+		if v == "" {
+			log.Fatal("Some required environment variables are not set. Please check the .env file.")
+		}
+	}
+
 	if env.AppEnv == "development" {
 		log.Println("The App is running in development env")
 	}
