@@ -13,8 +13,12 @@ import (
 
 func NewSignupRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, group *gin.RouterGroup) {
 	ur := repository.NewUserRepository(db)
+	tokenSecret := env.AccessTokenSecret
+	tokenExpiry := env.AccessTokenExpiryHour
+	refreshTokenExpiry := env.RefreshTokenExpiryHour
+
 	sc := controller.SignupController{
-		SignupUsecase: usecase.NewSignupUsecase(ur, timeout),
+		SignupUsecase: usecase.NewSignupUsecase(ur, tokenSecret, tokenExpiry, refreshTokenExpiry),
 		Env:           env,
 	}
 	group.POST("/signup", sc.Signup)

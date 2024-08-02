@@ -13,8 +13,12 @@ import (
 
 func NewRefreshTokenRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, group *gin.RouterGroup) {
 	ur := repository.NewUserRepository(db)
+	tokenSecret := env.AccessTokenSecret
+	tokenExpiry := env.AccessTokenExpiryHour
+	refreshTokenExpiry := env.RefreshTokenExpiryHour
+
 	rtc := &controller.RefreshTokenController{
-		RefreshTokenUsecase: usecase.NewRefreshTokenUsecase(ur, timeout),
+		RefreshTokenUsecase: usecase.NewRefreshTokenUsecase(ur, tokenSecret, tokenExpiry, refreshTokenExpiry),
 		Env:                 env,
 	}
 	group.POST("/refresh", rtc.RefreshToken)
