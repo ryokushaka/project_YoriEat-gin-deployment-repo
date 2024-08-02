@@ -1,6 +1,8 @@
 package route
 
 import (
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,4 +23,7 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, gin *gin.Engi
 	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
 	// All Private APIs
 	//NewUserRouter(env, timeout, db, protectedRouter)
+
+	//	Swagger endpoint
+	gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
