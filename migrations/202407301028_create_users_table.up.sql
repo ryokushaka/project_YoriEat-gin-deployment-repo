@@ -6,5 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
     bio TEXT,
     social TEXT[],
     image TEXT,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    follower_list INT[],
+    following_list INT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

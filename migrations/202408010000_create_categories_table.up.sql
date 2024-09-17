@@ -3,5 +3,7 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(255) NOT NULL,
     bg_color VARCHAR(7) NOT NULL,
     txt_color VARCHAR(7) NOT NULL,
-    image TEXT NOT NULL
+    image TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
