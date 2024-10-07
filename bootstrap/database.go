@@ -3,34 +3,105 @@ package bootstrap
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
-	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/postgres"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-func NewPostgresDatabase(env *Env) *postgres.Client {
-	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		env.DBHost, env.DBPort, env.DBUser, env.DBPass, env.DBName,
-	)
-	db, err := sqlx.Connect("postgres", dsn)
+var (
+	db     *gorm.DB
+	sqlxDB *sqlx.DB
+)
+
+func initializeDB(env *Env) error {
+	var err error
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Seoul", env.DBHost, env.DBUser, env.DBPassword, env.DBName, env.DBPort, env.DBSSLMode)
+
+	db, err = connectWithRetry(dsn, 5, 5*time.Second)
 	if err != nil {
-		log.Fatal("Failed to connect to PostgreSQL:", err)
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	return &postgres.Client{DB: db}
+	// sqlx 연결 설정
+	sqlDB, err := db.DB()
+	if err != nil {
+		return fmt.Errorf("failed to get database connection: %w", err)
+	}
+	sqlxDB = sqlx.NewDb(sqlDB, "postgres")
+
+	// Connection Pool 설정
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	return nil
 }
 
-func ClosePostgresDBConnection(client *postgres.Client) {
-	if client == nil || client.DB == nil {
-		return
-	}
+func GetDB() *gorm.DB {
+	return db
+}
 
-	err := client.DB.Close()
+func GetSqlxDB() *sqlx.DB {
+	return sqlxDB
+}
+
+func NewPostgresDatabase() (*gorm.DB, *sqlx.DB, error) {
+	env, err := NewEnv()
 	if err != nil {
-		log.Fatal("Failed to close PostgreSQL connection:", err)
+		return nil, nil, fmt.Errorf("failed to load environment variables: %w", err)
 	}
 
-	log.Println("Connection to PostgreSQL closed.")
+	err = initializeDB(env)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return db, sqlxDB, nil
+}
+
+func ClosePostgresDBConnection() {
+	if db != nil {
+		sqlDB, err := db.DB()
+		if err != nil {
+			log.Printf("Error getting DB instance: %v", err)
+			return
+		}
+
+		err = sqlDB.Close()
+		if err != nil {
+			log.Printf("Error closing database connection: %v", err)
+			return
+		}
+
+		log.Println("Database connection closed successfully")
+	}
+
+	if sqlxDB != nil {
+		err := sqlxDB.Close()
+		if err != nil {
+			log.Printf("Error closing sqlx database connection: %v", err)
+		}
+	}
+}
+
+func connectWithRetry(dsn string, maxRetries int, retryInterval time.Duration) (*gorm.DB, error) {
+	var db *gorm.DB
+	var err error
+
+	for i := 0; i < maxRetries; i++ {
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		})
+		if err == nil {
+			return db, nil
+		}
+		log.Printf("Failed to connect to database (attempt %d/%d): %v", i+1, maxRetries, err)
+		time.Sleep(retryInterval)
+	}
+	return nil, fmt.Errorf("failed to connect to database after %d attempts: %w", maxRetries, err)
 }
