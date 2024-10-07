@@ -66,7 +66,9 @@ jobs:
             --build-arg DB_PORT=${{ secrets.DB_PORT }} \
             --build-arg DB_NAME=${{ secrets.DB_NAME }} \
             --build-arg DB_USER=${{ secrets.DB_USER }} \
-            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} .
+            --build-arg DB_SSLMODE=${{ secrets.DB_SSLMODE }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --build-arg AWS_REGION=${{ secrets.AWS_REGION }} .
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
@@ -83,6 +85,7 @@ jobs:
           --arg DB_PORT "${{ secrets.DB_PORT }}" \
           --arg DB_NAME "${{ secrets.DB_NAME }}" \
           --arg DB_USER "${{ secrets.DB_USER }}" \
+          --arg DB_SSLMODE "${{ secrets.DB_SSLMODE }}" \
           --arg DB_PASSWORD "${{ secrets.DB_PASSWORD }}" \
           '.containerDefinitions[0].image = $IMAGE |
             .containerDefinitions[0].environment += [
@@ -90,6 +93,7 @@ jobs:
               {name: "DB_PORT", value: $DB_PORT},
               {name: "DB_NAME", value: $DB_NAME},
               {name: "DB_USER", value: $DB_USER},
+              {name: "DB_SSLMODE", value: $DB_SSLMODE},
               {name: "DB_PASSWORD", value: $DB_PASSWORD}
             ]')
           
