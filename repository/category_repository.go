@@ -2,50 +2,48 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"github.com/jmoiron/sqlx"
+
+	"gorm.io/gorm"
+
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
 type categoryRepository struct {
-	db *sqlx.DB
+	db *gorm.DB
 }
 
-func NewCategoryRepository(db *sqlx.DB) domain.CategoryRepository {
+func NewCategoryRepository(db *gorm.DB) domain.CategoryRepository {
 	return &categoryRepository{
 		db: db,
 	}
 }
 
 func (cr *categoryRepository) Create(ctx context.Context, category *domain.Category) error {
-	query := `INSERT INTO categories (name, bg_color, txt_color, image) VALUES ($1, $2, $3, $4)`
-	_, err := cr.db.ExecContext(ctx, query, category.Name, category.BgColor, category.TxtColor, category.Image)
-	return err
+	result := cr.db.WithContext(ctx).Create(category)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
 
 func (cr *categoryRepository) Fetch(ctx context.Context) ([]domain.Category, error) {
 	var categories []domain.Category
-	query := `SELECT id, name, bg_color, txt_color, image FROM categories`
-	err := cr.db.SelectContext(ctx, &categories, query)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return []domain.Category{}, nil
-		}
-		return nil, err
+	result := cr.db.WithContext(ctx).Find(&categories)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 	return categories, nil
 }
 
 func (cr *categoryRepository) GetByID(ctx context.Context, id string) (domain.Category, error) {
 	var category domain.Category
-	query := `SELECT id, name, bg_color, txt_color, image FROM categories WHERE id = $1`
-	err := cr.db.GetContext(ctx, &category, query, id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+	result := cr.db.WithContext(ctx).First(&category, id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return category, nil
 		}
-		return category, err
+		return category, result.Error
 	}
 	return category, nil
 }
