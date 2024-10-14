@@ -74,7 +74,11 @@ jobs:
             {"name": "DB_USER", "value": "${{ secrets.DB_USER }}"},
             {"name": "DB_SSLMODE", "value": "${{ secrets.DB_SSLMODE }}"},
             {"name": "DB_PASSWORD", "value": "${{ secrets.DB_PASSWORD }}"},
-            {"name": "AWS_REGION", "value": "${{ secrets.AWS_REGION }}"}
+            {"name": "AWS_REGION", "value": "${{ secrets.AWS_REGION }}"},
+            {"name": "ACCESS_TOKEN_SECRET", "value": "${{ secrets.ACCESS_TOKEN_SECRET }}"},
+            {"name": "REFRESH_TOKEN_SECRET", "value": "${{ secrets.REFRESH_TOKEN_SECRET }}"},
+            {"name": "ACCESS_TOKEN_EXPIRY_HOUR", "value": "${{ secrets.ACCESS_TOKEN_EXPIRY_HOUR }}"},
+            {"name": "REFRESH_TOKEN_EXPIRY_HOUR", "value": "${{ secrets.REFRESH_TOKEN_EXPIRY_HOUR }}"}
           ]')
 
           NEW_TASK_DEFINITION_ARN=$(aws ecs register-task-definition --family $ECS_TASK_DEFINITION --cli-input-json "$NEW_TASK_DEFINITION" --query taskDefinition.taskDefinitionArn --output text)
