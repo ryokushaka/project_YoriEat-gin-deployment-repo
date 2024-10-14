@@ -93,7 +93,7 @@ jobs:
           ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
         run: |
           echo "Waiting for service to be stable..."
-          aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
+          aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE --max-attempts 40 --delay 30
 
           if [ $? -ne 0 ]; then
             echo "Service failed to stabilize. Error code: $?"
