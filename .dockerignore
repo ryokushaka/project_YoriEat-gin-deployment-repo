@@ -1,9 +1,20 @@
-# Ignore everything except the necessary files
-*
-!.env
+# Ignore common files and directories
+.git
+.gitignore
+.dockerignore
+Dockerfile
+README.md
+
+# Ignore build artifacts
+bin/
+tmp/
+
+# Keep all necessary Go files and directories
+!*.go
 !go.mod
 !go.sum
 !cmd/
+!api/
+!bootstrap/
 !internal/
 !pkg/
-!main.go
