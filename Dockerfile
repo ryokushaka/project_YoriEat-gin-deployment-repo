@@ -10,8 +10,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 
 # Download and tidy Go modules
-RUN go mod download
-RUN go mod tidy
+RUN go mod download && go mod verify
 
 # Copy the rest of the files
 COPY . .
@@ -28,7 +27,7 @@ FROM public.ecr.aws/docker/library/alpine:latest
 
 RUN apk --no-cache add ca-certificates postgresql-client
 
-WORKDIR /root/
+WORKDIR /app
 
 # Copy the built files and necessary files
 COPY --from=builder /app/main .
