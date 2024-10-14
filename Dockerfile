@@ -10,8 +10,9 @@ WORKDIR /app
 COPY go.mod .
 COPY go.sum .
 
-# Go 모듈 다운로드
+# Go 모듈 다운로드 및 정리
 RUN go mod download
+RUN go mod tidy
 
 # 나머지 파일들을 복사
 COPY . .
@@ -21,7 +22,7 @@ RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag init -g cmd/main.go
 
 # 빌드
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o main cmd/main.go
 
 # 실행 스테이지
 FROM alpine:latest
@@ -33,31 +34,6 @@ WORKDIR /root/
 # 빌드 스테이지에서 빌드한 파일과 필요한 파일들만 복사
 COPY --from=builder /app/main .
 COPY --from=builder /app/docs ./docs
-
-# 환경 변수 설정
-ARG DB_HOST
-ARG DB_PORT
-ARG DB_NAME
-ARG DB_USER
-ARG DB_SSLMODE
-ARG DB_PASSWORD
-ARG AWS_REGION
-ARG ACCESS_TOKEN_EXPIRY_HOUR
-ARG REFRESH_TOKEN_EXPIRY_HOUR
-ARG ACCESS_TOKEN_SECRET
-ARG REFRESH_TOKEN_SECRET
-
-ENV DB_HOST=$DB_HOST \
-    DB_PORT=$DB_PORT \
-    DB_NAME=$DB_NAME \
-    DB_USER=$DB_USER \
-    DB_SSLMODE=$DB_SSLMODE \
-    DB_PASSWORD=$DB_PASSWORD \
-    AWS_REGION=$AWS_REGION \
-    ACCESS_TOKEN_EXPIRY_HOUR=$ACCESS_TOKEN_EXPIRY_HOUR \
-    REFRESH_TOKEN_EXPIRY_HOUR=$REFRESH_TOKEN_EXPIRY_HOUR \
-    ACCESS_TOKEN_SECRET=$ACCESS_TOKEN_SECRET \
-    REFRESH_TOKEN_SECRET=$REFRESH_TOKEN_SECRET
 
 # 컨테이너가 실행되면 실행할 명령어
 CMD ["./main"]
