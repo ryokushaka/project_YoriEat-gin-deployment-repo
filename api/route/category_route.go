@@ -1,8 +1,6 @@
 package route
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/api/controller"
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/bootstrap"
@@ -11,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewCategoryRouter(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, group *gin.RouterGroup) {
+func NewCategoryRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	categoryRepo := repository.NewCategoryRepository(db)
 	categoryUsecase := usecase.NewCategoryUsecase(categoryRepo)
 	categoryController := controller.NewCategoryController(categoryUsecase)
