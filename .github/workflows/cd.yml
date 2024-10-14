@@ -50,6 +50,9 @@ jobs:
         run: |
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION --query taskDefinition)
 
+          # Filter out unwanted fields
+          TASK_DEFINITION=$(echo $TASK_DEFINITION | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
           NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "${{ steps.build-image.outputs.image }}" \
           '.containerDefinitions[0].image = $IMAGE')
 

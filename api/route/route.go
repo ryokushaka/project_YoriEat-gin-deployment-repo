@@ -16,20 +16,20 @@ import (
 func Setup(env *bootstrap.Env, timeout time.Duration, db *gorm.DB, gin *gin.Engine) {
 	publicRouter := gin.Group("")
 	// All Public APIs
-	NewSignupRouter(env, timeout, db, publicRouter)
-	NewLoginRouter(env, timeout, db, publicRouter)
-	NewRefreshTokenRouter(env, timeout, db, publicRouter)
+	NewSignupRouter(env, db, publicRouter)
+	NewLoginRouter(env, db, publicRouter)
+	NewRefreshTokenRouter(env, db, publicRouter)
 
 	protectedRouter := gin.Group("")
 	// Middleware to verify AccessToken
 	protectedRouter.Use(middleware.JwtAuthMiddleware(env.AccessTokenSecret))
 	// All Private APIs
-	NewCategoryRouter(env, timeout, db, protectedRouter)
-	NewRecipeRouter(env, timeout, db, protectedRouter)
-	NewScriptRouter(env, timeout, db, protectedRouter)
-	NewCommentRouter(env, timeout, db, protectedRouter)
-	NewUserLikesRouter(env, timeout, db, protectedRouter)
-	NewUserRouter(env, timeout, db, protectedRouter)
+	NewCategoryRouter(env, db, protectedRouter)
+	NewRecipeRouter(env, db, protectedRouter)
+	NewScriptRouter(env, db, protectedRouter)
+	NewCommentRouter(env, db, protectedRouter)
+	NewUserLikesRouter(env, db, protectedRouter)
+	NewUserRouter(env, db, protectedRouter)
 
 	//	Swagger endpoint
 	gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
