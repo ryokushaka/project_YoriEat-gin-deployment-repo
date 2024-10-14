@@ -45,6 +45,8 @@ jobs:
 
       - name: Update ECS task definition
         id: update-task-definition
+        env:
+          ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
         run: |
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION --query taskDefinition)
 
