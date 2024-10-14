@@ -1,7 +1,7 @@
-FROM golang:1.22-alpine
+FROM golang:1.22-alpine AS builder
 
 # 필요한 패키지 설치
-RUN apk add --no-cache git bash postgresql-client
+RUN apk add --no-cache git bash
 
 # 작업 디렉토리 생성
 WORKDIR /app
@@ -12,32 +12,24 @@ COPY . .
 # Go 모듈 다운로드
 RUN go mod download
 
-# Swagger CLI 설치
+# Swagger CLI 설치 및 문서 생성
 RUN go install github.com/swaggo/swag/cmd/swag@latest
-
-# Swagger 문서 생성
 RUN swag init -g cmd/main.go
 
 # 빌드
-RUN go build -o main cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main cmd/main.go
 
-# 빌드 시 전달받을 ARG 정의
-ARG DB_HOST
-ARG DB_PORT
-ARG DB_NAME
-ARG DB_USER
-ARG DB_SSLMODE
-ARG DB_PASSWORD
-ARG AWS_REGION
+# 실행 스테이지
+FROM alpine:latest
 
-# 환경 변수 설정
-ENV DB_HOST=${DB_HOST}
-ENV DB_PORT=${DB_PORT}
-ENV DB_NAME=${DB_NAME}
-ENV DB_USER=${DB_USER}
-ENV DB_SSLMODE=${DB_SSLMODE}
-ENV DB_PASSWORD=${DB_PASSWORD}
-ENV AWS_REGION=${AWS_REGION}
+RUN apk --no-cache add ca-certificates posgresql-client
+
+WORKDIR /root/
+
+# 빌드 스테이지에서 빌드한 파일과 필요한 파일들만 복사
+COPY --from=builder /app/main .
+COPY --from=builder /app/docs ./docs
+COPY .env .
 
 # 컨테이너가 실행되면 실행할 명령어
 CMD ["/app/main"]
