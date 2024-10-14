@@ -1,23 +1,14 @@
-name: Deploy to ECR and ECS
+name: Continuous Deployment
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
-
-env:
-  AWS_REGION: ap-northeast-2
-  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-  ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
-  ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
-  ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
 
 jobs:
-  build:
-    name: Deploy to ECR and ECS
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, '🆗 safe')
 
     steps:
       - name: Check out code
@@ -28,34 +19,12 @@ jobs:
         with:
           go-version: 1.22
 
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-${{ hashFiles('**/*.go') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-
-            ${{ runner.os }}-go-
-
-#      - name: Run tests
-#        run: go test -v ./...
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Verify AWS credentials
-        run: |
-          aws sts get-caller-identity
-          if [ $? -ne 0 ]; then
-            echo "Failed to verify AWS credentials. Please check your AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY."
-            exit 1
-          fi
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -77,11 +46,10 @@ jobs:
         id: update-task-definition
         run: |
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION --query taskDefinition)
-          
+
           NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "${{ steps.build-image.outputs.image }}" \
           '.containerDefinitions[0].image = $IMAGE')
-          
-          # GitHub Secrets를 환경 변수로 설정
+
           NEW_TASK_DEFINITION=$(echo $NEW_TASK_DEFINITION | jq '.containerDefinitions[0].environment = [
             {"name": "DB_HOST", "value": "${{ secrets.DB_HOST }}"},
             {"name": "DB_PORT", "value": "${{ secrets.DB_PORT }}"},
@@ -91,9 +59,9 @@ jobs:
             {"name": "DB_PASSWORD", "value": "${{ secrets.DB_PASSWORD }}"},
             {"name": "AWS_REGION", "value": "${{ secrets.AWS_REGION }}"}
           ]')
-          
+
           NEW_TASK_DEFINITION_ARN=$(aws ecs register-task-definition --family $ECS_TASK_DEFINITION --cli-input-json "$NEW_TASK_DEFINITION" --query taskDefinition.taskDefinitionArn --output text)
-          
+
           if [ $? -ne 0 ]; then
             echo "Failed to register new task definition. Error code: $?"
             exit 1
@@ -104,7 +72,7 @@ jobs:
       - name: Update ECS service
         run: |
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ steps.update-task-definition.outputs.NEW_TASK_DEFINITION_ARN }} --force-new-deployment
-          
+
           if [ $? -ne 0 ]; then
             echo "Failed to update ECS service. Error code: $?"
             exit 1
@@ -114,12 +82,12 @@ jobs:
         run: |
           echo "Waiting for service to be stable..."
           aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
-          
+
           if [ $? -ne 0 ]; then
             echo "Service failed to stabilize. Error code: $?"
             echo "Cluster: $ECS_CLUSTER"
             echo "Service: $ECS_SERVICE"
             exit 1
           fi
-          
+
           echo "Deployment completed successfully"
