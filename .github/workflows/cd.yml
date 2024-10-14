@@ -88,6 +88,9 @@ jobs:
           fi
 
       - name: Verify deployment
+        env:
+          ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+          ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
         run: |
           echo "Waiting for service to be stable..."
           aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
