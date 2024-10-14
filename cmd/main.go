@@ -55,7 +55,7 @@ func setupRouter(app *bootstrap.Application) *gin.Engine {
 
 	router.GET("/health", healthCheckHandler(app))
 
-	route.Setup(env, timeout, app.DB, app.SqlxDB, router)
+	route.Setup(env, timeout, app.DB, router)
 	return router
 }
 

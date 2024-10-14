@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
