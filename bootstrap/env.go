@@ -3,6 +3,8 @@ package bootstrap
 import (
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/spf13/viper"
 )
@@ -26,17 +28,31 @@ type Env struct {
 
 func NewEnv() (*Env, error) {
 	env := &Env{}
-	viper.SetConfigFile(".env")
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		return nil, fmt.Errorf("error reading config file: %w", err)
+	if os.Getenv("APP_ENV") == "development" {
+		viper.SetConfigFile(".env")
+
+		err := viper.ReadInConfig()
+		if err != nil {
+			log.Println("Warning: Error reading .env file, falling back to environment variables")
+		}
 	}
 
-	err = viper.Unmarshal(env)
-	if err != nil {
-		return nil, fmt.Errorf("unable to decode into struct: %w", err)
-	}
+	// 환경 변수 또는 .env 파일에서 값을 읽어옴
+	env.AppEnv = getEnv("APP_ENV", "development")
+	env.ServerAddress = getEnv("SERVER_ADDRESS", ":8080")
+	env.ContextTimeout = getEnvAsInt("CONTEXT_TIMEOUT", 2)
+	env.DBHost = getEnv("DB_HOST", "")
+	env.DBUser = getEnv("DB_USER", "")
+	env.DBName = getEnv("DB_NAME", "")
+	env.DBPort = getEnv("DB_PORT", "")
+	env.DBSSLMode = getEnv("DB_SSLMODE", "")
+	env.DBPassword = getEnv("DB_PASSWORD", "")
+	env.AWSRegion = getEnv("AWS_REGION", "")
+	env.AccessTokenExpiryHour = getEnvAsInt("ACCESS_TOKEN_EXPIRY_HOUR", 2)
+	env.RefreshTokenExpiryHour = getEnvAsInt("REFRESH_TOKEN_EXPIRY_HOUR", 168)
+	env.AccessTokenSecret = getEnv("ACCESS_TOKEN_SECRET", "")
+	env.RefreshTokenSecret = getEnv("REFRESH_TOKEN_SECRET", "")
 
 	requiredEnvVars := []string{
 		"DB_HOST", "DB_USER", "DB_NAME", "DB_PORT",
@@ -45,7 +61,7 @@ func NewEnv() (*Env, error) {
 	}
 
 	for _, v := range requiredEnvVars {
-		if viper.GetString(v) == "" {
+		if getEnv(v, "") == "" {
 			return nil, fmt.Errorf("required environment variable not set: %s", v)
 		}
 	}
@@ -55,4 +71,20 @@ func NewEnv() (*Env, error) {
 	}
 
 	return env, nil
+}
+
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value != "" {
+		return value
+	}
+	return viper.GetString(key)
+}
+
+func getEnvAsInt(key string, defaultValue int) int {
+	valueStr := getEnv(key, "")
+	if value, err := strconv.Atoi(valueStr); err == nil {
+		return value
+	}
+	return defaultValue
 }
