@@ -7,8 +7,7 @@ RUN apk add --no-cache git bash
 WORKDIR /app
 
 # go.mod와 go.sum 파일을 먼저 복사
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
 
 # Go 모듈 다운로드 및 정리
 RUN go mod download
