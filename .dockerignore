@@ -1,3 +1,9 @@
-# Ignore everything except the .env file
+# Ignore everything except the necessary files
 *
 !.env
+!go.mod
+!go.sum
+!cmd/
+!internal/
+!pkg/
+!main.go
