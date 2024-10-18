@@ -17,6 +17,6 @@ func NewUserRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	group.POST("/users", userController.CreateUser)
 	group.GET("/users", userController.FetchUsers)
 	group.GET("/users/email/:email", userController.GetUserByEmail)
-	group.GET("/users/:id", userController.GetUserByID)
-	group.PUT("/users/:id", userController.UpdateUser)
+	group.GET("/users/:user_id", userController.GetUserByID)
+	group.PUT("/users/:user_id", userController.UpdateUser)
 }
