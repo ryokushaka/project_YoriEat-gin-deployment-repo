@@ -46,7 +46,7 @@ func NewEnv() (*Env, error) {
 	env.DBUser = getEnv("DB_USER", "")
 	env.DBName = getEnv("DB_NAME", "")
 	env.DBPort = getEnv("DB_PORT", "")
-	env.DBSSLMode = getEnv("DB_SSLMODE", "")
+	env.DBSSLMode = getEnv("DB_SSLMODE", "disable")
 	env.DBPassword = getEnv("DB_PASSWORD", "")
 	env.AWSRegion = getEnv("AWS_REGION", "")
 	env.AccessTokenExpiryHour = getEnvAsInt("ACCESS_TOKEN_EXPIRY_HOUR", 2)

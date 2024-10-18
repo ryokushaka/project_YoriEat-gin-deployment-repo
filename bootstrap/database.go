@@ -101,6 +101,7 @@ func connectWithRetry(dsn string, maxRetries int, retryInterval time.Duration) (
 			return db, nil
 		}
 		log.Printf("Failed to connect to database (attempt %d/%d): %v", i+1, maxRetries, err)
+		log.Printf("Error details: %+v", err)
 		time.Sleep(retryInterval)
 	}
 	return nil, fmt.Errorf("failed to connect to database after %d attempts: %w", maxRetries, err)
