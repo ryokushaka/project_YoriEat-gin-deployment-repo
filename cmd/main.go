@@ -18,12 +18,6 @@ func main() {
 	}
 	defer app.CloseDBConnection()
 
-	if app.Env.AppEnv == "release" {
-		gin.SetMode(gin.ReleaseMode)
-	} else {
-		gin.SetMode(gin.DebugMode)
-	}
-
 	if err := checkDatabaseConnection(app); err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
@@ -36,7 +30,18 @@ func main() {
 }
 
 func initializeApp() (*bootstrap.Application, error) {
-	return bootstrap.App()
+	app, err := bootstrap.App()
+	if err != nil {
+		return nil, err
+	}
+
+	if app.Env.AppEnv == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
+	}
+
+	return app, nil
 }
 
 func setupRouter(app *bootstrap.Application) *gin.Engine {

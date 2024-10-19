@@ -72,6 +72,8 @@ func NewEnv() (*Env, error) {
 		log.Println("The App is running in development env")
 	}
 
+	log.Printf("APP_ENV is set to: %s", env.AppEnv)
+
 	return env, nil
 }
 
