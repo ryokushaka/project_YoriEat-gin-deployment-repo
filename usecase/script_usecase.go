@@ -10,6 +10,7 @@ type scriptUsecase struct {
 	scriptRepo domain.ScriptRepository
 }
 
+// NewScriptUsecase creates a new instance of ScriptUsecase.
 func NewScriptUsecase(scriptRepo domain.ScriptRepository) domain.ScriptUsecase {
 	return &scriptUsecase{
 		scriptRepo: scriptRepo,

@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Env holds the environment variables for the application.
 type Env struct {
 	AppEnv                 string `mapstructure:"APP_ENV"`
 	ServerAddress          string `mapstructure:"SERVER_ADDRESS"`
@@ -26,6 +27,7 @@ type Env struct {
 	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
 }
 
+// NewEnv initializes and returns a new Env instance.
 func NewEnv() (*Env, error) {
 	env := &Env{}
 
@@ -39,7 +41,7 @@ func NewEnv() (*Env, error) {
 	}
 
 	// 환경 변수 또는 .env 파일에서 값을 읽어옴
-	env.AppEnv = getEnv("APP_ENV", "development")
+	env.AppEnv = getEnv("APP_ENV", "release")
 	env.ServerAddress = getEnv("SERVER_ADDRESS", ":8080")
 	env.ContextTimeout = getEnvAsInt("CONTEXT_TIMEOUT", 2)
 	env.DBHost = getEnv("DB_HOST", "")
@@ -66,7 +68,7 @@ func NewEnv() (*Env, error) {
 		}
 	}
 
-	if env.AppEnv == "development" {
+	if env.AppEnv == "debug" {
 		log.Println("The App is running in development env")
 	}
 

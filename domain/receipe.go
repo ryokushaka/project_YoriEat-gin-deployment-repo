@@ -2,6 +2,7 @@ package domain
 
 import "context"
 
+// Recipe represents a recipe entity.
 type Recipe struct {
 	ID          int      `json:"id"`
 	Name        string   `json:"name"`
@@ -15,6 +16,7 @@ type Recipe struct {
 	UserID      int      `json:"user_id"`
 }
 
+// RecipeUsecase represents the recipe use case interface.
 type RecipeUsecase interface {
 	Create(c context.Context, recipe *Recipe) error
 	Fetch(c context.Context) ([]Recipe, error)
@@ -23,6 +25,7 @@ type RecipeUsecase interface {
 	Delete(c context.Context, id string) error
 }
 
+// RecipeRepository represents the recipe repository interface.
 type RecipeRepository interface {
 	Create(c context.Context, recipe *Recipe) error
 	Fetch(c context.Context) ([]Recipe, error)

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewScriptRouter sets up the script routes.
 func NewScriptRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	scriptRepo := repository.NewScriptRepository(db)
 	scriptUsecase := usecase.NewScriptUsecase(scriptRepo)

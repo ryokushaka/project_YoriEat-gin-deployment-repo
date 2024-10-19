@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewUserRouter sets up the user routes.
 func NewUserRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	userRepo := repository.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo)

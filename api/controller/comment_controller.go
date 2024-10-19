@@ -8,16 +8,19 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
+// CommentController handles comment-related HTTP requests.
 type CommentController struct {
 	CommentUsecase domain.CommentUsecase
 }
 
+// NewCommentController creates a new CommentController.
 func NewCommentController(cu domain.CommentUsecase) *CommentController {
 	return &CommentController{
 		CommentUsecase: cu,
 	}
 }
 
+// CreateComment handles the creation of a new comment.
 func (cc *CommentController) CreateComment(c *gin.Context) {
 	var comment domain.Comment
 	if err := c.ShouldBindJSON(&comment); err != nil {
@@ -34,6 +37,7 @@ func (cc *CommentController) CreateComment(c *gin.Context) {
 	c.JSON(http.StatusCreated, comment)
 }
 
+// FetchCommentsByRecipeID handles fetching comments by recipe ID.
 func (cc *CommentController) FetchCommentsByRecipeID(c *gin.Context) {
 	recipeID, err := strconv.Atoi(c.Param("recipe_id"))
 	if err != nil {
@@ -50,6 +54,7 @@ func (cc *CommentController) FetchCommentsByRecipeID(c *gin.Context) {
 	c.JSON(http.StatusOK, comments)
 }
 
+// GetCommentByID handles fetching a comment by its ID.
 func (cc *CommentController) GetCommentByID(c *gin.Context) {
 	id := c.Param("id")
 	comment, err := cc.CommentUsecase.GetByID(c.Request.Context(), id)

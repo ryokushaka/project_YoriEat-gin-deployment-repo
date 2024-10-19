@@ -42,14 +42,17 @@ func initializeDB(env *Env) error {
 	return nil
 }
 
+// GetDB returns the gorm.DB instance.
 func GetDB() *gorm.DB {
 	return db
 }
 
+// GetSqlxDB returns the sqlx.DB instance.
 func GetSqlxDB() *sqlx.DB {
 	return sqlxDB
 }
 
+// NewPostgresDatabase initializes and returns the gorm.DB and sqlx.DB instances.
 func NewPostgresDatabase() (*gorm.DB, *sqlx.DB, error) {
 	env, err := NewEnv()
 	if err != nil {
@@ -64,6 +67,7 @@ func NewPostgresDatabase() (*gorm.DB, *sqlx.DB, error) {
 	return db, sqlxDB, nil
 }
 
+// ClosePostgresDBConnection closes the database connections.
 func ClosePostgresDBConnection() {
 	if db != nil {
 		sqlDB, err := db.DB()

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewCommentRouter sets up the comment routes.
 func NewCommentRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	commentRepo := repository.NewCommentRepository(db)
 	commentUsecase := usecase.NewCommentUsecase(commentRepo)

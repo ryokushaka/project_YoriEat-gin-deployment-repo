@@ -8,16 +8,19 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
+// UserLikesController handles user likes-related HTTP requests.
 type UserLikesController struct {
 	UserLikesUsecase domain.UserLikesUsecase
 }
 
+// NewUserLikesController creates a new UserLikesController.
 func NewUserLikesController(ulu domain.UserLikesUsecase) *UserLikesController {
 	return &UserLikesController{
 		UserLikesUsecase: ulu,
 	}
 }
 
+// AddLike handles adding a like to a recipe by a user.
 func (ulc *UserLikesController) AddLike(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -43,6 +46,7 @@ func (ulc *UserLikesController) AddLike(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Like added"})
 }
 
+// RemoveLike handles removing a like from a recipe by a user.
 func (ulc *UserLikesController) RemoveLike(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -65,6 +69,7 @@ func (ulc *UserLikesController) RemoveLike(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Like removed"})
 }
 
+// FetchLikesByUserID handles fetching all likes by a user.
 func (ulc *UserLikesController) FetchLikesByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi("user_id")
 	if err != nil {

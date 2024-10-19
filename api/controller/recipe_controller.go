@@ -7,16 +7,19 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
+// RecipeController handles recipe-related HTTP requests.
 type RecipeController struct {
 	RecipeUsecase domain.RecipeUsecase
 }
 
+// NewRecipeController creates a new RecipeController.
 func NewRecipeController(ru domain.RecipeUsecase) *RecipeController {
 	return &RecipeController{
 		RecipeUsecase: ru,
 	}
 }
 
+// CreateRecipe handles the creation of a new recipe.
 func (rc *RecipeController) CreateRecipe(c *gin.Context) {
 	var recipe domain.Recipe
 	if err := c.ShouldBindJSON(&recipe); err != nil {
@@ -33,6 +36,7 @@ func (rc *RecipeController) CreateRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, recipe)
 }
 
+// FetchRecipes handles fetching all recipes.
 func (rc *RecipeController) FetchRecipes(c *gin.Context) {
 	recipes, err := rc.RecipeUsecase.Fetch(c.Request.Context())
 	if err != nil {
@@ -43,6 +47,7 @@ func (rc *RecipeController) FetchRecipes(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
 
+// GetRecipeByID handles fetching a recipe by its ID.
 func (rc *RecipeController) GetRecipeByID(c *gin.Context) {
 	id := c.Param("id")
 	recipe, err := rc.RecipeUsecase.GetByID(c.Request.Context(), id)
@@ -59,6 +64,7 @@ func (rc *RecipeController) GetRecipeByID(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
+// UpdateRecipe handles updating an existing recipe.
 func (rc *RecipeController) UpdateRecipe(c *gin.Context) {
 	var recipe domain.Recipe
 	if err := c.ShouldBindJSON(&recipe); err != nil {
@@ -75,6 +81,7 @@ func (rc *RecipeController) UpdateRecipe(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
+// DeleteRecipe handles deleting a recipe by its ID.
 func (rc *RecipeController) DeleteRecipe(c *gin.Context) {
 	id := c.Param("id")
 	err := rc.RecipeUsecase.Delete(c.Request.Context(), id)

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewRefreshTokenRouter sets up the refresh token routes.
 func NewRefreshTokenRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	ur := repository.NewUserRepository(db)
 	tokenSecret := env.AccessTokenSecret

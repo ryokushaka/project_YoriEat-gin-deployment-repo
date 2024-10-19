@@ -9,6 +9,7 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/internal/tokenutil"
 )
 
+// JwtAuthMiddleware returns a middleware function that validates JWT tokens.
 func JwtAuthMiddleware(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")

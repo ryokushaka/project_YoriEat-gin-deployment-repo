@@ -13,6 +13,7 @@ type categoryRepository struct {
 	db *gorm.DB
 }
 
+// NewCategoryRepository creates a new instance of CategoryRepository.
 func NewCategoryRepository(db *gorm.DB) domain.CategoryRepository {
 	return &categoryRepository{
 		db: db,

@@ -10,6 +10,7 @@ type recipeUsecase struct {
 	recipeRepo domain.RecipeRepository
 }
 
+// NewRecipeUsecase creates a new instance of RecipeUsecase.
 func NewRecipeUsecase(recipeRepo domain.RecipeRepository) domain.RecipeUsecase {
 	return &recipeUsecase{
 		recipeRepo: recipeRepo,

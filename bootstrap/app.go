@@ -5,12 +5,14 @@ import (
 	"gorm.io/gorm"
 )
 
+// Application holds the environment and database connections for the application.
 type Application struct {
 	Env    *Env
 	DB     *gorm.DB
 	SqlxDB *sqlx.DB
 }
 
+// App initializes and returns a new Application instance.
 func App() (*Application, error) {
 	env, err := NewEnv()
 	if err != nil {
@@ -29,6 +31,7 @@ func App() (*Application, error) {
 	}, nil
 }
 
+// CloseDBConnection closes the database connections.
 func (app *Application) CloseDBConnection() {
 	ClosePostgresDBConnection()
 }

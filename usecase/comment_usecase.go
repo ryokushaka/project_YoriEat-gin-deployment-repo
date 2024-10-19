@@ -10,6 +10,7 @@ type commentUsecase struct {
 	commentRepo domain.CommentRepository
 }
 
+// NewCommentUsecase creates a new instance of CommentUsecase.
 func NewCommentUsecase(commentRepo domain.CommentRepository) domain.CommentUsecase {
 	return &commentUsecase{
 		commentRepo: commentRepo,

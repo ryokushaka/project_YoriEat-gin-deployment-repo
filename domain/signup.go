@@ -4,6 +4,7 @@ import (
 	"context"
 )
 
+// SignupRequest represents a signup request payload.
 type SignupRequest struct {
 	ID       int    `form:"id"`
 	Name     string `form:"name" binding:"required"`
@@ -11,11 +12,13 @@ type SignupRequest struct {
 	Password string `form:"password" binding:"required"`
 }
 
+// SignupResponse represents a signup response payload.
 type SignupResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 }
 
+// SignupUsecase represents the signup use case interface.
 type SignupUsecase interface {
 	Create(c context.Context, user *User) error
 	GetUserByEmail(c context.Context, email string) (User, error)

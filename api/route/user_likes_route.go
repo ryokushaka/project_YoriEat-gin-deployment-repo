@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewUserLikesRouter sets up the user likes routes.
 func NewUserLikesRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	userLikesRepo := repository.NewUserLikesRepository(db)
 	userLikesUsecase := usecase.NewUserLikesUsecase(userLikesRepo)

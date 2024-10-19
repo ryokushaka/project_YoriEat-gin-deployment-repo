@@ -11,6 +11,7 @@ type commentRepository struct {
 	db *gorm.DB
 }
 
+// NewCommentRepository creates a new instance of CommentRepository.
 func NewCommentRepository(db *gorm.DB) domain.CommentRepository {
 	return &commentRepository{
 		db: db,
