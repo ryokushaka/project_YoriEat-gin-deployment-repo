@@ -15,6 +15,7 @@ type loginUsecase struct {
 	refreshTokenExpiry int
 }
 
+// NewLoginUsecase creates a new instance of LoginUsecase.
 func NewLoginUsecase(userRepo domain.UserRepository, tokenSecret string, tokenExpiry int, refreshTokenExpiry int) domain.LoginUsecase {
 	return &loginUsecase{
 		userRepo:           userRepo,

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewSignupRouter sets up the signup routes.
 func NewSignupRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	ur := repository.NewUserRepository(db)
 	tokenSecret := env.AccessTokenSecret

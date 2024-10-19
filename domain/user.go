@@ -5,9 +5,11 @@ import (
 )
 
 const (
+	// CollectionUser is the name of the user collection in the database.
 	CollectionUser = "users"
 )
 
+// User represents a user entity.
 type User struct {
 	ID       int      `json:"id"`
 	Name     string   `json:"name"`
@@ -19,6 +21,7 @@ type User struct {
 	Password string   `json:"password"`
 }
 
+// UserUsecase represents the user use case interface.
 type UserUsecase interface {
 	Create(c context.Context, user *User) error
 	Fetch(c context.Context) ([]User, error)
@@ -27,6 +30,7 @@ type UserUsecase interface {
 	Update(c context.Context, user *User) error
 }
 
+// UserRepository represents the user repository interface.
 type UserRepository interface {
 	Create(c context.Context, user *User) error
 	Fetch(c context.Context) ([]User, error)

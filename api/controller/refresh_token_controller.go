@@ -8,11 +8,13 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
+// RefreshTokenController handles refresh token-related HTTP requests.
 type RefreshTokenController struct {
 	RefreshTokenUsecase domain.RefreshTokenUsecase
 	Env                 *bootstrap.Env
 }
 
+// RefreshToken handles the refresh token requests.
 func (rtc *RefreshTokenController) RefreshToken(c *gin.Context) {
 	var request domain.RefreshTokenRequest
 

@@ -11,6 +11,7 @@ type scriptRepository struct {
 	db *gorm.DB
 }
 
+// NewScriptRepository creates a new instance of ScriptRepository.
 func NewScriptRepository(db *gorm.DB) domain.ScriptRepository {
 	return &scriptRepository{
 		db: db,

@@ -10,17 +10,20 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
+// LoginController handles login-related HTTP requests.
 type LoginController struct {
 	LoginUsecase domain.LoginUsecase
 	Env          *bootstrap.Env
 }
 
+// NewLoginController creates a new LoginController.
 func NewLoginController(usecase domain.LoginUsecase) *LoginController {
 	return &LoginController{
 		LoginUsecase: usecase,
 	}
 }
 
+// Login handles user login requests.
 func (lc *LoginController) Login(c *gin.Context) {
 	var request domain.LoginRequest
 

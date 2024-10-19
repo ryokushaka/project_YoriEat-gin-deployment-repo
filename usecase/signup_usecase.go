@@ -15,6 +15,7 @@ type signupUsecase struct {
 	refreshTokenExpiry int
 }
 
+// NewSignupUsecase creates a new instance of SignupUsecase.
 func NewSignupUsecase(userRepo domain.UserRepository, tokenSecret string, tokenExpiry int, refreshTokenExpiry int) domain.SignupUsecase {
 	return &signupUsecase{
 		userRepo:           userRepo,

@@ -7,16 +7,19 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
+// CategoryController handles category-related HTTP requests.
 type CategoryController struct {
 	CategoryUsecase domain.CategoryUsecase
 }
 
+// NewCategoryController creates a new CategoryController.
 func NewCategoryController(cu domain.CategoryUsecase) *CategoryController {
 	return &CategoryController{
 		CategoryUsecase: cu,
 	}
 }
 
+// CreateCategory handles the creation of a new category.
 func (cc *CategoryController) CreateCategory(c *gin.Context) {
 	var category domain.Category
 	if err := c.ShouldBindJSON(&category); err != nil {
@@ -33,6 +36,7 @@ func (cc *CategoryController) CreateCategory(c *gin.Context) {
 	c.JSON(http.StatusCreated, category)
 }
 
+// FetchCategories handles fetching all categories.
 func (cc *CategoryController) FetchCategories(c *gin.Context) {
 	categories, err := cc.CategoryUsecase.Fetch(c.Request.Context())
 	if err != nil {
@@ -43,6 +47,7 @@ func (cc *CategoryController) FetchCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
+// GetCategoryByID handles fetching a category by its ID.
 func (cc *CategoryController) GetCategoryByID(c *gin.Context) {
 	id := c.Param("id")
 	category, err := cc.CategoryUsecase.GetByID(c.Request.Context(), id)

@@ -10,6 +10,7 @@ type userLikesUsecase struct {
 	userLikesRepo domain.UserLikesRepository
 }
 
+// NewUserLikesUsecase creates a new instance of UserLikesUsecase.
 func NewUserLikesUsecase(userLikesRepo domain.UserLikesRepository) domain.UserLikesUsecase {
 	return &userLikesUsecase{
 		userLikesRepo: userLikesRepo,

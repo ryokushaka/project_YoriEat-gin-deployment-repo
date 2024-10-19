@@ -10,6 +10,7 @@ type categoryUsecase struct {
 	categoryRepo domain.CategoryRepository
 }
 
+// NewCategoryUsecase creates a new instance of CategoryUsecase.
 func NewCategoryUsecase(categoryRepo domain.CategoryRepository) domain.CategoryUsecase {
 	return &categoryUsecase{
 		categoryRepo: categoryRepo,

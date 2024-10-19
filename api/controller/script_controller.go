@@ -8,16 +8,19 @@ import (
 	"github.com/ryokushaka/project_YoriEat-gin-deployment-repo/domain"
 )
 
+// ScriptController handles script-related HTTP requests.
 type ScriptController struct {
 	ScriptUsecase domain.ScriptUsecase
 }
 
+// NewScriptController creates a new ScriptController.
 func NewScriptController(su domain.ScriptUsecase) *ScriptController {
 	return &ScriptController{
 		ScriptUsecase: su,
 	}
 }
 
+// CreateScript handles the creation of a new script.
 func (sc *ScriptController) CreateScript(c *gin.Context) {
 	var script domain.Script
 	if err := c.ShouldBindJSON(&script); err != nil {
@@ -34,6 +37,7 @@ func (sc *ScriptController) CreateScript(c *gin.Context) {
 	c.JSON(http.StatusCreated, script)
 }
 
+// FetchScripts handles fetching all scripts.
 func (sc *ScriptController) FetchScripts(c *gin.Context) {
 	scripts, err := sc.ScriptUsecase.Fetch(c.Request.Context())
 	if err != nil {
@@ -44,6 +48,7 @@ func (sc *ScriptController) FetchScripts(c *gin.Context) {
 	c.JSON(http.StatusOK, scripts)
 }
 
+// GetScriptByID handles fetching a script by its ID.
 func (sc *ScriptController) GetScriptByID(c *gin.Context) {
 	id := c.Param("id")
 	script, err := sc.ScriptUsecase.GetByID(c.Request.Context(), id)
@@ -60,6 +65,7 @@ func (sc *ScriptController) GetScriptByID(c *gin.Context) {
 	c.JSON(http.StatusOK, script)
 }
 
+// AddRecipeToScript handles adding a recipe to a script.
 func (sc *ScriptController) AddRecipeToScript(c *gin.Context) {
 	scriptID, err := strconv.Atoi(c.Param("script_id"))
 	if err != nil {
@@ -85,6 +91,7 @@ func (sc *ScriptController) AddRecipeToScript(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Recipe added to script"})
 }
 
+// RemoveRecipeFromScript handles removing a recipe from a script.
 func (sc *ScriptController) RemoveRecipeFromScript(c *gin.Context) {
 	scriptID, err := strconv.Atoi(c.Param("script_id"))
 	if err != nil {

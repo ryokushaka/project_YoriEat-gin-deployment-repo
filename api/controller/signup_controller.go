@@ -9,11 +9,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// SignupController handles signup-related HTTP requests.
 type SignupController struct {
 	SignupUsecase domain.SignupUsecase
 	Env           *bootstrap.Env
 }
 
+// Signup handles user signup requests.
 func (sc *SignupController) Signup(c *gin.Context) {
 	var request domain.SignupRequest
 

@@ -12,6 +12,7 @@ type userLikesRepository struct {
 	db *gorm.DB
 }
 
+// NewUserLikesRepository creates a new instance of UserLikesRepository.
 func NewUserLikesRepository(db *gorm.DB) domain.UserLikesRepository {
 	return &userLikesRepository{
 		db: db,

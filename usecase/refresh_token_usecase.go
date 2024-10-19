@@ -15,6 +15,7 @@ type refreshTokenUsecase struct {
 	refreshTokenExpiry int
 }
 
+// NewRefreshTokenUsecase creates a new instance of RefreshTokenUsecase.
 func NewRefreshTokenUsecase(userRepo domain.UserRepository, tokenSecret string, tokenExpiry int, refreshTokenExpiry int) domain.RefreshTokenUsecase {
 	return &refreshTokenUsecase{
 		userRepo:           userRepo,

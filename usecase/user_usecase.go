@@ -10,6 +10,7 @@ type userUsecase struct {
 	userRepo domain.UserRepository
 }
 
+// NewUserUsecase creates a new instance of UserUsecase.
 func NewUserUsecase(userRepo domain.UserRepository) domain.UserUsecase {
 	return &userUsecase{
 		userRepo: userRepo,

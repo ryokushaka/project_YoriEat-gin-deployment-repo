@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewRecipeRouter sets up the recipe routes.
 func NewRecipeRouter(env *bootstrap.Env, db *gorm.DB, group *gin.RouterGroup) {
 	recipeRepo := repository.NewRecipeRepository(db)
 	recipeUsecase := usecase.NewRecipeUsecase(recipeRepo)

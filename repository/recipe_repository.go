@@ -13,6 +13,7 @@ type recipeRepository struct {
 	db *gorm.DB
 }
 
+// NewRecipeRepository creates a new instance of RecipeRepository.
 func NewRecipeRepository(db *gorm.DB) domain.RecipeRepository {
 	return &recipeRepository{
 		db: db,
